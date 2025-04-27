@@ -18,11 +18,7 @@ router.get("/embed/:content", async (ctx) => {
     generateStatus(ID.toString(), URL, ctx.params.content, ctx.request.url.searchParams.get("attachments") || "");
 
     const file = Deno.readFileSync("./Source/Static/Home.html");
-    let fileContent = new TextDecoder().decode(file);
-
-    if (ctx.request.url.searchParams.get("request") !== "") {
-        fileContent = fileContent.toString().replace("{{REDIRECT}}", ctx.request.url.searchParams.get("request") || "https://discord.com/channels/@me");
-    }
+    const fileContent = new TextDecoder().decode(file);
 
     ctx.response.body = fileContent.toString()
         /* Templating */
@@ -31,6 +27,7 @@ router.get("/embed/:content", async (ctx) => {
         .replace("{{Footer}}", templateHTML.Footer)
         /* URL */
         .replaceAll("{{URL}}", templateHTML.URL)
+        .replace("{{REDIRECT}}", ctx.request.url.searchParams.get("redirect") || "https://discord.com/channels/@me");
 
     return;
 });
@@ -56,7 +53,7 @@ router.get("/oembed.json", async (ctx) => {
 router.get("/user.json", async (ctx) => {
     ctx.response.type = "application/json";
 
-    const redirect = ctx.request.url.searchParams.get("REDIRECT")
+    const redirect = ctx.request.url.searchParams.get("redirect")
     const file = Deno.readFileSync("./Source/Static/user.json");
     const fileContent = new TextDecoder().decode(file);
 
