@@ -1,6 +1,6 @@
 {
     "preferredUsername": "kokosq",
-    "url": "https://discord.com/channels/@me",
+    "url": "{{REDIRECT}}",
     "icon": {
         "type": "Image",
         "mediaType": "image/jpeg",

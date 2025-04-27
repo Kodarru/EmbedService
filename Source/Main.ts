@@ -18,7 +18,11 @@ router.get("/embed/:content", async (ctx) => {
     generateStatus(ID.toString(), URL, ctx.params.content, ctx.request.url.searchParams.get("attachments") || "");
 
     const file = Deno.readFileSync("./Source/Static/Home.html");
-    const fileContent = new TextDecoder().decode(file);
+    let fileContent = new TextDecoder().decode(file);
+
+    if (ctx.request.url.searchParams.get("request") !== "") {
+        fileContent = fileContent.toString().replace("{{REDIRECT}}", ctx.request.url.searchParams.get("request") || "https://discord.com/channels/@me");
+    }
 
     ctx.response.body = fileContent.toString()
         /* Templating */
@@ -27,6 +31,7 @@ router.get("/embed/:content", async (ctx) => {
         .replace("{{Footer}}", templateHTML.Footer)
         /* URL */
         .replaceAll("{{URL}}", templateHTML.URL)
+
     return;
 });
 
@@ -50,7 +55,13 @@ router.get("/oembed.json", async (ctx) => {
 
 router.get("/user.json", async (ctx) => {
     ctx.response.type = "application/json";
-    ctx.response.body = Deno.readFileSync("./Source/Static/user.json");
+
+    const redirect = ctx.request.url.searchParams.get("REDIRECT")
+    const file = Deno.readFileSync("./Source/Static/user.json");
+    const fileContent = new TextDecoder().decode(file);
+
+    ctx.response.body = fileContent.toString()
+        .replace("{{REDIRECT}}", redirect || "https://discord.com/channels/@me")
 })
 
 const app = new Application();
