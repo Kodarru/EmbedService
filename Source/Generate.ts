@@ -4,7 +4,7 @@ type Status = {
     "attachment":   string[]
 }
 
-export function generateStatus(ID: string, URL: string, content: string, attachments: string): string {
+export function generateStatus(ID: string, URL: string, content: string, attachments: string, redirect: string): string {
     let attach = attachments.split(",").map(item => item.trim());
 
     if (attach.length === 1 && attach[0] === "") {
@@ -12,7 +12,7 @@ export function generateStatus(ID: string, URL: string, content: string, attachm
     }
 
     const status: Status = {
-        attributedTo: `${URL}/user.json`,
+        attributedTo: `${URL}/user.json?redirect=${redirect}`,
         content:      content,
         attachment:   attach,
     };

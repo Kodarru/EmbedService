@@ -15,7 +15,7 @@ router.get("/embed/:content", async (ctx) => {
         Footer: ctx.request.url.searchParams.get("footer") || "   ",
     }
 
-    generateStatus(ID.toString(), URL, ctx.params.content, ctx.request.url.searchParams.get("attachments") || "");
+    generateStatus(ID.toString(), URL, ctx.params.content, ctx.request.url.searchParams.get("attachments") || "", ctx.request.url.searchParams.get("redirect") || "https://discord.com/channels/@me");
 
     const file = Deno.readFileSync("./Source/Static/Home.html");
     const fileContent = new TextDecoder().decode(file);
@@ -27,7 +27,6 @@ router.get("/embed/:content", async (ctx) => {
         .replace("{{Footer}}", templateHTML.Footer)
         /* URL */
         .replaceAll("{{URL}}", templateHTML.URL)
-        .replace("{{REDIRECT}}", ctx.request.url.searchParams.get("redirect") || "https://discord.com/channels/@me");
 
     return;
 });
