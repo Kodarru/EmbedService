@@ -5,7 +5,11 @@ type Status = {
 }
 
 export function generateStatus(ID: string, URL: string, content: string, attachments: string): string {
-    const attach = attachments.split(",").map(item => item.trim());
+    let attach = attachments.split(",").map(item => item.trim());
+
+    if (attach.length === 1 && attach[0] === "") {
+        attach = [];
+    }
 
     const status: Status = {
         attributedTo: `${URL}/user.json`,
