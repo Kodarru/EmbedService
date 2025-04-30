@@ -8,4 +8,5 @@ type EmbedDataType = {
         link_url?: string;
         icon_url?: string;
     }
+    features?: [];
 }

@@ -47,17 +47,19 @@ router.get("/embed/:base64content", async (ctx) => {
     const ID = Date.now();
     const URL = ctx.request.url.origin.replace("http://", "https://")
 
-    console.log(URL);
-
     let DecodedContent: EmbedDataType;
 
     try {
-        console.log(atob(ctx.params.base64content))
         DecodedContent = JSON.parse(atob(ctx.params.base64content));
     } catch (error) {
-        console.error("Failed to decode or parse base64content:", error);
-        ctx.response.status = 400;
-        ctx.response.body = { error: "Invalid base64 or JSON content" };
+        console.log(error);
+        const file = Deno.readFileSync("./Source/Static/Errors/Base64DecodeFailure.html");
+        const fileContent = new TextDecoder().decode(file).toString()
+
+        ctx.response.body = HandleBars(fileContent, {
+            URL: URL,
+        });
+
         return;
     }
 
@@ -68,8 +70,13 @@ router.get("/embed/:base64content", async (ctx) => {
         ctx.response.body = send()
      }
      */
+    let timestamp = false;
 
-    new EmbedData(ID.toString(), DecodedContent, URL);
+    if (DecodedContent.features?.includes("TIMESTAMP")) {
+        timestamp = true;
+    }
+
+    new EmbedData(URL, ID.toString(), DecodedContent, timestamp);
 
     const file = Deno.readFileSync("./Source/Static/Home.html");
     const fileContent = new TextDecoder().decode(file).toString()
@@ -85,6 +92,12 @@ router.get("/embed/:base64content", async (ctx) => {
 
 router.get("/embed-data/:id", async (ctx) => {
     const id = ctx.params.id;
+
+    if (id === "base64error") {
+        await send(ctx, `./Source/Static/Errors/Base64Error.json`)
+        ctx.response.headers.set("Content-Type", "application/activity+json")
+        return;
+    }
 
     try {
         await send(ctx, `./Source/Embed-Data/${id}.json`)
