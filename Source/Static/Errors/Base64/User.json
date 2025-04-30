@@ -1,0 +1,9 @@
+{
+  "preferredUsername": "Base64 Error",
+  "url": "https://github.com/Kodarru/EmbedService",
+  "icon": {
+    "type": "Image",
+    "mediaType": "image/jpeg",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/Radiation_warning_symbol.svg/2048px-Radiation_warning_symbol.svg.png"
+  }
+}

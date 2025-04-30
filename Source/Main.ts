@@ -53,7 +53,7 @@ router.get("/embed/:base64content", async (ctx) => {
         DecodedContent = JSON.parse(atob(ctx.params.base64content));
     } catch (error) {
         console.log(error);
-        const file = Deno.readFileSync("./Source/Static/Errors/Base64DecodeFailure.html");
+        const file = Deno.readFileSync("./Source/Static/Errors/Base64/Base64DecodeFailure.html");
         const fileContent = new TextDecoder().decode(file).toString()
 
         ctx.response.body = HandleBars(fileContent, {
@@ -94,7 +94,7 @@ router.get("/embed-data/:id", async (ctx) => {
     const id = ctx.params.id;
 
     if (id === "base64error") {
-        const file = Deno.readFileSync("./Source/Static/Errors/Base64Error.json");
+        const file = Deno.readFileSync("./Source/Static/Errors/Base64/Base64Error.json");
         const fileContent = new TextDecoder().decode(file).toString()
 
         ctx.response.headers.set("Content-Type", "application/activity+json")
@@ -122,6 +122,14 @@ router.get("/oembed.json", async (ctx) => {
 
 router.get("/user.json/:base64content", async (ctx) => {
     ctx.response.type = "application/json";
+
+    if (ctx.params.base64content === "base64error") {
+        const file = Deno.readFileSync("./Source/Static/Errors/Base64/User.json");
+        ctx.response.body = new TextDecoder().decode(file).toString()
+
+        return;
+    }
+
 
     const decodedContent: EmbedDataType.author = JSON.parse(atob(ctx.params.base64content));
 
