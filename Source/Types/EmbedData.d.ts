@@ -1,7 +1,7 @@
 type EmbedDataType = {
     content:       string;
     /* If you don't want to attach anything, just set it to [] */
-    attachments:   string[];
+    attachments:   [];
     footer?:       string;
     author?: {
         name?:     string;
