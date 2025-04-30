@@ -1,5 +1,5 @@
 {
-    "attributedTo": "https://localhost:8000/user.json",
-    "content": "Failed to decode base64 string. Is it a valid base64 string?",
+    "attributedTo": "{{URL}}/user.json",
+    "content": "⛔ Failed to decode base64 string. Is it a valid base64 string?",
     "attachment": []
 }

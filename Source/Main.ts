@@ -94,8 +94,13 @@ router.get("/embed-data/:id", async (ctx) => {
     const id = ctx.params.id;
 
     if (id === "base64error") {
-        await send(ctx, `./Source/Static/Errors/Base64Error.json`)
-        ctx.response.headers.set("Content-Type", "application/activity+json")
+        const file = Deno.readFileSync("./Source/Static/Errors/Base64Error.json");
+        const fileContent = new TextDecoder().decode(file).toString()
+
+        ctx.response.body = HandleBars(fileContent, {
+            URL: ctx.request.url.origin.replace("http://", "https://"),
+        });
+
         return;
     }
 
