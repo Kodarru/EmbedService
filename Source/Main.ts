@@ -104,7 +104,7 @@ router.get("/oembed.json", async (ctx) => {
 router.get("/user.json/:base64content", async (ctx) => {
     ctx.response.type = "application/json";
 
-    const decodedContent: EmbedDataType = JSON.parse(atob(ctx.params.base64content)).author;
+    const decodedContent: EmbedDataType.author = JSON.parse(atob(ctx.params.base64content));
 
     const file = Deno.readFileSync("./Source/Static/user.json");
     const fileContent = new TextDecoder().decode(file).toString()
