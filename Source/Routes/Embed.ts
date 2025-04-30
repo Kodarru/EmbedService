@@ -12,14 +12,18 @@ export function EmbedHandler(ctx: any) {
     try {
         DecodedContent = JSON.parse(atob(ctx.params.base64content));
     } catch (error) {
-        console.log(error);
-        const file = Filed("./Source/Content/Errors/Base64/Main.html");
+        if (ctx.request.headers.get("User-Agent")?.includes("Discordbot")) {
+            console.log(error);
+            const file = Filed("./Source/Content/Errors/Base64/Main.html");
 
-        ctx.response.body = HandleBars(file, {
-            URL: URL,
-        });
+            ctx.response.body = HandleBars(file, {
+                URL: URL,
+            });
 
-        return;
+            return;
+        } else {
+            ctx.response.redirect("https://discord.com/channels/@me");
+        }
     }
 
     /*
@@ -39,13 +43,17 @@ export function EmbedHandler(ctx: any) {
 
     const file = Filed("./Source/Content/Main.html");
 
-    ctx.response.headers.set("Content-Type", "text/html");
-    ctx.response.body = HandleBars(file, {
-        URL: URL,
-        ID: ID.toString(),
-        FOOTER: DecodedContent.footer || "   ",
-        AUTHOR_NAME: DecodedContent.author.name || "EmbedService",
-    });
+    if (ctx.request.headers.get("User-Agent")?.includes("Discordbot")) {
+        ctx.response.headers.set("Content-Type", "text/html");
+        ctx.response.body = HandleBars(file, {
+            URL: URL,
+            ID: ID.toString(),
+            FOOTER: DecodedContent.footer || "   ",
+            AUTHOR_NAME: DecodedContent.author.name || "EmbedService",
+        });
+    } else {
+        ctx.response.redirect(DecodedContent.author.link_url || "https://discord.com/channels/@me");
+    }
 
     return;
 }
