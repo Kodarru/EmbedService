@@ -1,49 +1,12 @@
-import { Application, Router, send } from "@oak/oak";
-import { EmbedData } from "./Embed.ts";
+import { Application, Router } from "@oak/oak";
 import { HandleBars } from "@/Utilities/Handlebars.ts";
 import { EmbedDataType } from "@/Types/EmbedData.d.ts";
+import { EmbedData } from "./Embed.ts";
+import { Filed } from "./Utilities/Filed.ts";
 
 const router = new Router();
-var URL = "";
-
-router.get("/handleBarTest", async (ctx) => {
-    const fileContent = "{{AGH}} guhh {{rizz}} {{rizz}}"
-
-    ctx.response.body = HandleBars(fileContent, {
-        AGH: "hello",
-        rizz: "sigma",
-    });
-
-    return;
-})
 
 router.get("/embed/:base64content", async (ctx) => {
-    /*const ID = Date.now();
-    const URL = ctx.request.url.origin.replace("http://", "https://")
-    const redirect = ctx.request.url.searchParams.get("redirect") || "https://discord.com/channels/@me";
-
-    console.log("redirect", redirect);
-
-    const templateHTML = {
-        URL: URL,
-        Color: ctx.request.url.searchParams.get("color") || "#FFF",
-        Footer: ctx.request.url.searchParams.get("footer") || "   ",
-    }
-
-    generateStatus(ID.toString(), URL, ctx.params.content, ctx.request.url.searchParams.get("attachments") || "", redirect);
-
-    const file = Deno.readFileSync("./Source/Static/Home.html");
-    const fileContent = new TextDecoder().decode(file);
-
-    ctx.response.body = fileContent.toString()
-        .replace("{{Color}}", templateHTML.Color)
-        .replace("{{ID}}", ID.toString())
-        .replace("{{Footer}}", templateHTML.Footer)
-
-        .replaceAll("{{URL}}", templateHTML.URL)
-
-    return;
-        */
     const ID = Date.now();
     const URL = ctx.request.url.origin.replace("http://", "https://")
 
@@ -53,10 +16,9 @@ router.get("/embed/:base64content", async (ctx) => {
         DecodedContent = JSON.parse(atob(ctx.params.base64content));
     } catch (error) {
         console.log(error);
-        const file = Deno.readFileSync("./Source/Static/Errors/Base64/Base64DecodeFailure.html");
-        const fileContent = new TextDecoder().decode(file).toString()
+        const file = Filed("./Source/Static/Errors/Base64/Main.html");
 
-        ctx.response.body = HandleBars(fileContent, {
+        ctx.response.body = HandleBars(file, {
             URL: URL,
         });
 
@@ -70,19 +32,18 @@ router.get("/embed/:base64content", async (ctx) => {
         ctx.response.body = send()
      }
      */
-    let timestamp = false;
 
-    if (DecodedContent.features?.includes("TIMESTAMP")) {
-        timestamp = true;
-    }
+    new EmbedData(
+        URL,
+        ID.toString(),
+        DecodedContent,
+        DecodedContent.features?.includes("TIMESTAMP") || false
+    );
 
-    new EmbedData(URL, ID.toString(), DecodedContent, timestamp);
-
-    const file = Deno.readFileSync("./Source/Static/Home.html");
-    const fileContent = new TextDecoder().decode(file).toString()
+    const file = Filed("./Source/Static/Main.html");
 
     ctx.response.headers.set("Content-Type", "text/html");
-    ctx.response.body = HandleBars(fileContent, {
+    ctx.response.body = HandleBars(file, {
         URL: URL,
         ID: ID.toString(),
         FOOTER: DecodedContent.footer || "   ",
@@ -94,11 +55,10 @@ router.get("/embed-data/:id", async (ctx) => {
     const id = ctx.params.id;
 
     if (id === "base64error") {
-        const file = Deno.readFileSync("./Source/Static/Errors/Base64/Base64Error.json");
-        const fileContent = new TextDecoder().decode(file).toString()
+        const file = Filed("./Source/Static/Errors/Base64/Message.json");
 
         ctx.response.headers.set("Content-Type", "application/activity+json")
-        ctx.response.body = HandleBars(fileContent, {
+        ctx.response.body = HandleBars(file, {
             URL: ctx.request.url.origin.replace("http://", "https://"),
         });
 
@@ -106,8 +66,8 @@ router.get("/embed-data/:id", async (ctx) => {
     }
 
     try {
-        await send(ctx, `./Source/Embed-Data/${id}.json`)
         ctx.response.headers.set("Content-Type", "application/activity+json")
+        ctx.response.body = Filed(`./Source/Embed-Data/${id}.json`);
     } catch (error) {
         if (!ctx.response.writable) return;
         ctx.response.status = 404;
@@ -117,26 +77,21 @@ router.get("/embed-data/:id", async (ctx) => {
 
 router.get("/oembed.json", async (ctx) => {
     ctx.response.type = "application/json+oembed";
-    ctx.response.body = Deno.readFileSync("./Source/Static/oembed.json");
+    ctx.response.body = Filed("./Source/Static/OEmbed.json");
 })
 
 router.get("/user.json/:base64content", async (ctx) => {
     ctx.response.type = "application/json";
 
     if (ctx.params.base64content === "base64error") {
-        const file = Deno.readFileSync("./Source/Static/Errors/Base64/User.json");
-        ctx.response.body = new TextDecoder().decode(file).toString()
-
+        ctx.response.body = Filed("./Source/Static/Errors/Base64/User.json")
         return;
     }
 
-
     const decodedContent: EmbedDataType.author = JSON.parse(atob(ctx.params.base64content));
+    const file = Filed("./Source/Static/User.json");
 
-    const file = Deno.readFileSync("./Source/Static/user.json");
-    const fileContent = new TextDecoder().decode(file).toString()
-
-    ctx.response.body = HandleBars(fileContent, {
+    ctx.response.body = HandleBars(file, {
         AUTHOR_NAME: decodedContent?.name || "EmbedService",
         AUTHOR_LINK: decodedContent?.link_url || "https://github.com/Kodarru/EmbedService",
         AUTHOR_ICON: decodedContent?.icon_url || "https://upload.wikimedia.org/wikipedia/commons/d/d2/Solid_white.png?20060513000852",
