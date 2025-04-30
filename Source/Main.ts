@@ -79,7 +79,7 @@ router.get("/embed/:base64content", async (ctx) => {
         URL: URL,
         ID: ID.toString(),
         FOOTER: DecodedContent.footer || "   ",
-        AUTHOR_NAME: DecodedContent.author.name || "SelfBot",
+        AUTHOR_NAME: DecodedContent.author.name || "EmbedService",
     });
 });
 
@@ -104,15 +104,15 @@ router.get("/oembed.json", async (ctx) => {
 router.get("/user.json/:base64content", async (ctx) => {
     ctx.response.type = "application/json";
 
-    const decodedContent: EmbedDataType.author = atob(ctx.params.base64content);
+    const decodedContent: EmbedDataType = JSON.parse(atob(ctx.params.base64content)).author;
 
     const file = Deno.readFileSync("./Source/Static/user.json");
     const fileContent = new TextDecoder().decode(file).toString()
 
     ctx.response.body = HandleBars(fileContent, {
-        AUTHOR_NAME: decodedContent.name || "SelfBot",
-        AUTHOR_LINK: decodedContent.link_url || "https://github.com/Kodarru/EmbedService",
-        AUTHOR_ICON: decodedContent.icon_url || "https://support.discord.com/hc/user_images/PRywUXcqg0v5DD6s7C3LyQ.jpeg",
+        AUTHOR_NAME: decodedContent?.name || "EmbedService",
+        AUTHOR_LINK: decodedContent?.link_url || "https://github.com/Kodarru/EmbedService",
+        AUTHOR_ICON: decodedContent?.icon_url || "https://upload.wikimedia.org/wikipedia/commons/d/d2/Solid_white.png?20060513000852",
     })
 
     return;
