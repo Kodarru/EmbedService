@@ -4,7 +4,6 @@
     "icon": {
         "type": "Image",
         "mediaType": "image/jpeg",
-        "comment": "cdn.discordapp.com/avatars/1365824037464309801/028b75f87d25209b4b7b192ce48ea5b5.webp?size=1024",
         "url": "{{AUTHOR_ICON}}"
     }
 }
