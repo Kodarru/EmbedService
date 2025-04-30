@@ -1,6 +1,9 @@
 import "@/Types/JSON.d.ts";
 
-export function HandleBars(text: string, data: {[key: string]: string | number | boolean | null | undefined }): string {
+export function HandleBars(
+    text: string,
+    data: JSONData
+): string {
     let string = text;
 
     for (const key in data) {

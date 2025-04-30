@@ -22,9 +22,9 @@ export class EmbedData {
         }
 
         const fileName = `${ID}.json`;
-        const filePath = `./Source/Embed-Data/${fileName}`;
+        const filePath = `./Embed-Data/${fileName}`;
 
-        Deno.mkdirSync("./Source/Embed-Data", { recursive: true });
+        Deno.mkdirSync("./Embed-Data", { recursive: true });
         Deno.writeTextFileSync(filePath, JSON.stringify(Embed, null, 2));
 
         this.output = filePath;

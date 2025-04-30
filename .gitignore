@@ -1,2 +1,3 @@
 Source/Embed-Data/*.json
+Embed-Data/*.json
 deno.lock
